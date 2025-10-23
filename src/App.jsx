@@ -30,6 +30,8 @@ function App() {
       </p>
 
       <p>If this is visible, github actions work :D</p>
+      <p>And if you see this, it's even better as it did not shit itself.</p>
+
     </>
   )
 }
