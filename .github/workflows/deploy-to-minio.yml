@@ -44,4 +44,4 @@ jobs:
 
       # 7️⃣ Upload React build
       - name: Upload React build to MinIO
-        run: mc cp -r dist/ ucloud/react-bucket/latest/
+        run: mc mirror --overwrite dist/ ucloud/react-bucket/latest/
