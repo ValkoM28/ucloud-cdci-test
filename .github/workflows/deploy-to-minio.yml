@@ -1,0 +1,47 @@
+name: Build and Upload React to MinIO
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout the code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # 3️⃣ Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # 4️⃣ Build React
+      - name: Build React app
+        run: npm run build
+
+      # 5️⃣ Install MinIO CLI
+      - name: Install MinIO mc
+        run: |
+          wget https://dl.min.io/client/mc/release/linux-amd64/mc
+          chmod +x mc
+          sudo mv mc /usr/local/bin/
+
+      # 6️⃣ Configure MinIO alias
+      - name: Configure mc alias
+        env:
+          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+        run: |
+          mc alias set ucloud https://app-nes-minio.cloud.sdu.dk $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
+
+      # 7️⃣ Upload React build
+      - name: Upload React build to MinIO
+        run: mc cp -r dist/ ucloud/react-bucket/latest/
