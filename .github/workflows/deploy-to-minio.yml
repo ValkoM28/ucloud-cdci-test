@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Set up Node.js
+      # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 4️⃣ Build React
+      # 4️⃣ Build React app
       - name: Build React app
         run: npm run build
 
@@ -42,6 +42,11 @@ jobs:
         run: |
           mc alias set ucloud https://app-nes-minio.cloud.sdu.dk $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
 
-      # 7️⃣ Upload React build
+      # 7️⃣ Upload React build to timestamped folder and update 'latest'
       - name: Upload React build to MinIO
-        run: mc mirror --overwrite dist/ ucloud/react-bucket/latest/
+        run: |
+          TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)
+          echo "Uploading build to $TIMESTAMP/"
+          mc mirror --overwrite dist/ ucloud/react-bucket/$TIMESTAMP/
+          echo "Updating 'latest/' folder"
+          mc mirror --overwrite --remove dist/ ucloud/react-bucket/latest/
